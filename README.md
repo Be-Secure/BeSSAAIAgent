@@ -1,4 +1,4 @@
-# **Be-Secure Security Analyst AI Agents (BeSSAAIAgents)**
+# **Be-Secure Security Analyst AI Agents ( a.k.a BeSSAAIAgents)**
 
 ## **1. Introduction and Goals**
 
