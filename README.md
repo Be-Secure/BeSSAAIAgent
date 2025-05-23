@@ -358,65 +358,9 @@ The BeSLab serves as the central operational environment where human analysts an
 
 ### **6.1. BeSLab and Playbook Interactions**
 
-The following diagram illustrates the interaction flow within BeSLab when a BeSPlaybook is executed:plantuml  
-```plantuml
-@startuml
-!theme materia
+The following diagram illustrates the interaction flow within BeSLab when a BeSPlaybook is executed:
+![BeSLab and Playbook Interactions](https://github.com/Be-Secure/BeSSAAIAgent/blob/main/images/BeSLabPlaybookInteraction4SAIAIAgent.png)
 
-actor "Human Analyst" as Analyst
-participant "BeSLab Platform" as BeSLab
-participant "BeSPlaybook Engine" as PlaybookEngine
-participant "BeSSAAIAgent" as Agent
-participant "BeSPlugin (Tool)" as Plugin
-database "Knowledge Base (RAG)" as RAG
-database "Audit Log" as Audit
-
-Analyst -> BeSLab : Initiate Playbook (e.g., "Assess OSS_X")
-BeSLab -> PlaybookEngine : Trigger Playbook (Playbook_ID, Target_OSS_X)
-PlaybookEngine -> Agent : Assign Playbook Task (Step 1 details)
-activate Agent
-
-Agent -> RAG : Query for context / knowledge (if needed)
-RAG --> Agent : Return relevant information
-
-Agent -> Plugin : Execute Action via STCP (Command for Step 1)
-activate Plugin
-Plugin --> Agent : Return STCP Response (Results/Status for Step 1)
-deactivate Plugin
-
-Agent -> PlaybookEngine : Report Step 1 Completion / Status
-PlaybookEngine -> Agent : Assign Next Playbook Step (e.g., Step 2)
-
-loop Playbook Steps
-Agent -> RAG : Query for context (if needed)
-RAG --> Agent : Return information
-Agent -> Plugin : Execute Action via STCP
-activate Plugin
-Plugin --> Agent : Return STCP Response
-deactivate Plugin
-Agent -> PlaybookEngine : Report Step Completion / Status
-alt Human Intervention Point (HITL)
-Agent -> BeSLab : Request Analyst Review (e.g., "Approve Patch?")
-BeSLab -> Analyst : Notify for Review
-Analyst -> BeSLab : Provide Decision (Approve/Reject/Modify)
-BeSLab -> Agent : Relay Analyst Decision
-Agent -> PlaybookEngine : Report HITL Outcome
-end
-PlaybookEngine -> Agent : Assign Next Step or End Playbook
-end
-
-Agent -> PlaybookEngine : Report Playbook Completion
-deactivate Agent
-PlaybookEngine -> BeSLab : Notify Playbook Completion (OSAR ready)
-BeSLab -> Analyst : Present Results / OSAR
-
-PlaybookEngine -> Audit : Log Playbook Execution Details
-Agent -> Audit : Log Agent Actions & Decisions
-Plugin -> Audit : Log Tool Execution Details
-BeSLab -> Audit : Log Analyst Interactions
-
-@enduml
-```
 **Explanation of the Diagram:**
 
 1.  **Initiation:** A Human Analyst initiates a BeSPlaybook through the BeSLab Platform, specifying the target (e.g., an OSS project).
@@ -433,72 +377,7 @@ BeSLab -> Audit : Log Analyst Interactions
 
 The following diagram illustrates how BeSSAAIAgents are onboarded, triggered, monitored, and audited within the BeSLab environment:
 
-
-```plantuml
-@startuml
-!theme materia
-
-participant "BeSLab Admin" as Admin
-participant "BeSLab Platform" as BeSLab
-participant "BeSSAAIAgent Repository" as AgentRepo
-participant "BeSSAAIAgent (Instance)" as AgentInstance
-participant "BeSPlaybook Engine" as PlaybookEngine
-participant "Monitoring System" as Monitor
-database "Audit Log" as AuditLog
-database "Agent Configuration DB" as AgentConfigDB
-
-group Onboarding
-    Admin -> BeSLab : Request Agent Onboarding (Agent_Type, Version)
-    BeSLab -> AgentRepo : Fetch Agent Package
-    AgentRepo --> BeSLab : Return Agent Package
-    BeSLab -> AgentConfigDB : Store Agent Configuration & Register Agent
-    BeSLab -> Admin : Confirm Agent Onboarding
-    BeSLab -> Monitor : Register Agent for Monitoring
-    BeSLab -> AuditLog : Log Agent Onboarding Event
-end
-
-group Triggering
-    PlaybookEngine -> BeSLab : Request Agent Instance (Agent_Type for Playbook_X)
-    BeSLab -> AgentConfigDB : Retrieve Agent Configuration
-    BeSLab -> AgentInstance : Instantiate/Activate Agent (with config, playbook task)
-    activate AgentInstance
-    AgentInstance -> PlaybookEngine : Acknowledge Activation & Task
-    PlaybookEngine -> AgentInstance : Start Playbook Execution
-    AgentInstance -> AuditLog : Log Task Initiation
-end
-
-group Monitoring
-    AgentInstance -> Monitor : Send Heartbeat / Status Updates / Metrics
-    Monitor -> BeSLab : Provide Agent Performance Dashboard
-    BeSLab -> Admin : Display Agent Status & Performance
-    alt Agent Error/Failure
-        AgentInstance -> Monitor : Report Error
-        Monitor -> BeSLab : Alert on Agent Error
-        BeSLab -> Admin : Notify Admin of Agent Issue
-        Admin -> BeSLab : Investigate / Restart Agent
-        BeSLab -> AuditLog : Log Agent Error & Admin Action
-    end
-end
-
-group Auditing
-    AgentInstance -> AuditLog : Log All Significant Actions, Decisions, STCP Calls
-    PlaybookEngine -> AuditLog : Log Playbook Progress, Agent Assignments
-    BeSPlugin -> AuditLog : Log Tool Execution Details (via STCP responses or direct logging)
-    BeSLab -> AuditLog : Log User Interactions, HITL Decisions, Agent Lifecycle Events
-    Admin -> AuditLog : Review Audit Trails for Compliance & Security
-end
-
-group Decommissioning (Optional)
-    Admin -> BeSLab : Request Agent Decommissioning
-    BeSLab -> AgentInstance : Send Shutdown Signal (if active)
-    deactivate AgentInstance
-    BeSLab -> AgentConfigDB : Unregister Agent
-    BeSLab -> Monitor : Unregister Agent from Monitoring
-    BeSLab -> AuditLog : Log Agent Decommissioning
-end
-
-@enduml
-```
+![BeS SA AI Agent Lifecycle in BeSLab](https://github.com/Be-Secure/BeSSAAIAgent/blob/main/images/BeSLabAISAAgentLifeCycle.png)
 
 **Explanation of the Diagram:**
 
