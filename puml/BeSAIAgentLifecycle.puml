@@ -1,0 +1,63 @@
+@startuml
+!theme materia
+
+participant "BeSLab Admin" as Admin
+participant "BeSLab Platform" as BeSLab
+participant "BeSSAAIAgent Repository" as AgentRepo
+participant "BeSSAAIAgent (Instance)" as AgentInstance
+participant "BeSPlaybook Engine" as PlaybookEngine
+participant "Monitoring System" as Monitor
+database "Audit Log" as AuditLog
+database "Agent Configuration DB" as AgentConfigDB
+
+group Onboarding
+    Admin -> BeSLab : Request Agent Onboarding (Agent_Type, Version)
+    BeSLab -> AgentRepo : Fetch Agent Package
+    AgentRepo --> BeSLab : Return Agent Package
+    BeSLab -> AgentConfigDB : Store Agent Configuration & Register Agent
+    BeSLab -> Admin : Confirm Agent Onboarding
+    BeSLab -> Monitor : Register Agent for Monitoring
+    BeSLab -> AuditLog : Log Agent Onboarding Event
+end
+
+group Triggering
+    PlaybookEngine -> BeSLab : Request Agent Instance (Agent_Type for Playbook_X)
+    BeSLab -> AgentConfigDB : Retrieve Agent Configuration
+    BeSLab -> AgentInstance : Instantiate/Activate Agent (with config, playbook task)
+    activate AgentInstance
+    AgentInstance -> PlaybookEngine : Acknowledge Activation & Task
+    PlaybookEngine -> AgentInstance : Start Playbook Execution
+    AgentInstance -> AuditLog : Log Task Initiation
+end
+
+group Monitoring
+    AgentInstance -> Monitor : Send Heartbeat / Status Updates / Metrics
+    Monitor -> BeSLab : Provide Agent Performance Dashboard
+    BeSLab -> Admin : Display Agent Status & Performance
+    alt Agent Error/Failure
+        AgentInstance -> Monitor : Report Error
+        Monitor -> BeSLab : Alert on Agent Error
+        BeSLab -> Admin : Notify Admin of Agent Issue
+        Admin -> BeSLab : Investigate / Restart Agent
+        BeSLab -> AuditLog : Log Agent Error & Admin Action
+    end
+end
+
+group Auditing
+    AgentInstance -> AuditLog : Log All Significant Actions, Decisions, STCP Calls
+    PlaybookEngine -> AuditLog : Log Playbook Progress, Agent Assignments
+    BeSPlugin -> AuditLog : Log Tool Execution Details (via STCP responses or direct logging)
+    BeSLab -> AuditLog : Log User Interactions, HITL Decisions, Agent Lifecycle Events
+    Admin -> AuditLog : Review Audit Trails for Compliance & Security
+end
+
+group Decommissioning (Optional)
+    Admin -> BeSLab : Request Agent Decommissioning
+    BeSLab -> AgentInstance : Send Shutdown Signal (if active)
+    deactivate AgentInstance
+    BeSLab -> AgentConfigDB : Unregister Agent
+    BeSLab -> Monitor : Unregister Agent from Monitoring
+    BeSLab -> AuditLog : Log Agent Decommissioning
+end
+
+@enduml
