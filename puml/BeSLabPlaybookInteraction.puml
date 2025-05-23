@@ -1,0 +1,56 @@
+@startuml
+!theme materia
+
+actor "Human Analyst" as Analyst
+participant "BeSLab Platform" as BeSLab
+participant "BeSPlaybook Engine" as PlaybookEngine
+participant "BeSSAAIAgent" as Agent
+participant "BeSPlugin (Tool)" as Plugin
+database "Knowledge Base (RAG)" as RAG
+database "Audit Log" as Audit
+
+Analyst -> BeSLab : Initiate Playbook (e.g., "Assess OSS_X")
+BeSLab -> PlaybookEngine : Trigger Playbook (Playbook_ID, Target_OSS_X)
+PlaybookEngine -> Agent : Assign Playbook Task (Step 1 details)
+activate Agent
+
+Agent -> RAG : Query for context / knowledge (if needed)
+RAG --> Agent : Return relevant information
+
+Agent -> Plugin : Execute Action via STCP (Command for Step 1)
+activate Plugin
+Plugin --> Agent : Return STCP Response (Results/Status for Step 1)
+deactivate Plugin
+
+Agent -> PlaybookEngine : Report Step 1 Completion / Status
+PlaybookEngine -> Agent : Assign Next Playbook Step (e.g., Step 2)
+
+loop Playbook Steps
+Agent -> RAG : Query for context (if needed)
+RAG --> Agent : Return information
+Agent -> Plugin : Execute Action via STCP
+activate Plugin
+Plugin --> Agent : Return STCP Response
+deactivate Plugin
+Agent -> PlaybookEngine : Report Step Completion / Status
+alt Human Intervention Point (HITL)
+Agent -> BeSLab : Request Analyst Review (e.g., "Approve Patch?")
+BeSLab -> Analyst : Notify for Review
+Analyst -> BeSLab : Provide Decision (Approve/Reject/Modify)
+BeSLab -> Agent : Relay Analyst Decision
+Agent -> PlaybookEngine : Report HITL Outcome
+end
+PlaybookEngine -> Agent : Assign Next Step or End Playbook
+end
+
+Agent -> PlaybookEngine : Report Playbook Completion
+deactivate Agent
+PlaybookEngine -> BeSLab : Notify Playbook Completion (OSAR ready)
+BeSLab -> Analyst : Present Results / OSAR
+
+PlaybookEngine -> Audit : Log Playbook Execution Details
+Agent -> Audit : Log Agent Actions & Decisions
+Plugin -> Audit : Log Tool Execution Details
+BeSLab -> Audit : Log Analyst Interactions
+
+@enduml
