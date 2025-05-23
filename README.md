@@ -359,7 +359,7 @@ The BeSLab serves as the central operational environment where human analysts an
 ### **6.1. BeSLab and Playbook Interactions**
 
 The following diagram illustrates the interaction flow within BeSLab when a BeSPlaybook is executed:plantuml  
-
+```plantuml
 @startuml
 !theme materia
 
@@ -498,7 +498,7 @@ group Decommissioning (Optional)
 end
 
 @enduml
-
+```plantuml
 
 **Explanation of the Diagram:**
 
@@ -535,6 +535,7 @@ This agent is responsible for executing assessment playbooks and generating OSAR
 
 * **Scenario:** The BeSSAAgent-Assessor is tasked with assessing an open-source library, example\_lib, using a BeSPlaybook that involves SCA and SAST scans.  
 * **BeSPlaybook Snippet (Conceptual YAML):**
+
 ```yaml  
 playbook_id: OS_ASSESS_BASIC_001
 name: Basic OSS Assessment
@@ -562,6 +563,7 @@ steps:
     action: generate_report
     input_from_steps: [20, 29] # Use results from SCA and SAST
     tool_selector: bes_report_generator_llm
+```yaml
 
 * Illustrative Code (LangGraph \- Conceptual):  
   LangGraph is suitable here for managing the state (scan results) across multiple steps and orchestrating the flow.
@@ -668,6 +670,9 @@ steps:
 # print("\n---FINAL OSAR---")
 # print(final_state.get("osar"))
 
+
+```Python
+
 * **Expected Output:** A dictionary or JSON object representing the OSAR, containing sections for SCA findings (e.g., {"dependencies": [{"name": "dep1", "version": "1.0", "vulnerabilities": ["CVE-2023-0001"]}]}) and SAST findings (e.g., {"sast_findings": [{"cwe": "CWE-79", "file": "app.js", "line": 10}]}). The bes_report_generator_llm would synthesize these into a coherent report.
 
 The structure of this agent demonstrates how a playbook's sequential steps can be mapped to a LangGraph workflow. Each step involves an STCP call (abstracted by a LangChain tool) to a BeSPlugin. The state management in LangGraph ensures that results from earlier steps (SCA, SAST) are available for later steps (report generation). This aligns with the need for agents to manage context during playbook execution.
@@ -678,6 +683,7 @@ This agent suggests patches for identified vulnerabilities.
 
 * **Scenario:** A critical SQL injection vulnerability (CWE-89) is found in example\_lib by BeSSAAgent-Assessor. BeSSAAgent-Remediator is tasked to suggest a patch.  
 * **BeSPlaybook Snippet (Conceptual YAML):**  
+
 ```YAML  
 playbook_id: OS_REMEDIATE_SQLI_001
 name: SQL Injection Basic Remediation
@@ -712,7 +718,8 @@ steps:
 
 * Illustrative Code (LangChain with RAG \- Conceptual):  
   This involves an agent using RAG to find secure coding patterns and then an LLM to generate a patch.1  
-  ```Python  
+
+```Python  
 # Conceptual: Agent uses RAG to find best practices for fixing CWE-89
 # then calls bes_patch_suggester_llm tool with context.
 
@@ -805,8 +812,9 @@ This scenario shows how different BeSSAAIAgents might collaborate.
 * **Scenario:** BeSSAAgent-Assessor completes an assessment of example\_lib, finds a critical vulnerability (CVE-2023-1234), and needs to inform BeSSAAgent-Remediator to initiate the remediation process.  
 * Illustrative Code (AutoGen \- Conceptual Message Passing):  
   AutoGen's strength lies in facilitating conversations and collaboration between agents. 53  
-  Python  
- # import autogen
+
+```Python  
+# import autogen
 # import os
 
 # # Configuration for LLMs (using environment variables for API keys)
@@ -858,11 +866,16 @@ This scenario shows how different BeSSAAIAgents might collaborate.
 #     recipient=remediator_agent,
 #     message=f"Assessment for example_lib is complete. Please report critical findings to the Remediator. Here is the summary: \n{assessment_summary}"
 # )
+```Python 
 
 * **Expected Outcome (Simulated Conversation Flow):**  
-  1. BeS\_Lab\_UserProxy (to BeSSAAgent\_Assessor): "Assessment for example\_lib is complete. Please report critical findings to the Remediator. Here is the summary:..."  
-  2. BeSSAAgent\_Assessor (to BeSSAAgent\_Remediator): "Remediator, I have completed the assessment for example\_lib v1.2.3. A CRITICAL vulnerability, CVE-2023-1234 (SQL Injection), was found in 'db\_connector.py' in the 'get\_user\_data' function. The 'user\_id' input is vulnerable. Please initiate remediation."  
-  3. BeSSAAgent\_Remediator (to BeSSAAgent\_Assessor): "Acknowledged, Assessor. I will prioritize CVE-2023-1234 in example\_lib. My initial plan is to: 1\. Analyze the vulnerable code snippet for 'get\_user\_data'. 2\. Use RAG to find the standard parameterized query pattern for Python. 3\. Generate a patch suggestion. I will now proceed with the 'OS\_REMEDIATE\_SQLI\_001' playbook."
+  1. BeS_Lab_UserProxy (to BeSSAAgent_Assessor): "Assessment for example_lib is complete. Please report critical findings to the Remediator. Here is the summary:..."  
+  2. BeSSAAgent_Assessor (to BeSSAAgent_Remediator): "Remediator, I have completed the assessment for example_lib v1.2.3. A CRITICAL vulnerability, CVE-2023-1234 (SQL Injection), was found in 'db_connector.py' in the 'get_user_data' function. The 'user_id' input is vulnerable. Please initiate remediation."  
+  3. BeSSAAgent_Remediator (to BeSSAAgent_Assessor): "Acknowledged, Assessor. I will prioritize CVE-2023-1234 in example_lib.
+     My initial plan is to:
+         1. Analyze the vulnerable code snippet for 'get_user_data'.
+         2. Use RAG to find the standard parameterized query pattern for Python.
+         3. Generate a patch suggestion. I will now proceed with the 'OS_REMEDIATE_SQLI_001' playbook."
 
 This multi-agent scenario demonstrates how specialized agents can collaborate. AutoGen facilitates this by allowing agents to "converse" and pass information. The Assessor provides a structured summary, and the Remediator acknowledges and formulates its own plan based on that input, referencing its own playbooks. This handoff is crucial for the OASP services, as assessment naturally precedes remediation. The clear definition of roles and system messages helps guide the LLMs within each agent to perform their designated part of the collaborative task.
 
