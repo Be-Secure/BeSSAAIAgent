@@ -416,7 +416,7 @@ Plugin -> Audit : Log Tool Execution Details
 BeSLab -> Audit : Log Analyst Interactions
 
 @enduml
-
+```
 **Explanation of the Diagram:**
 
 1.  **Initiation:** A Human Analyst initiates a BeSPlaybook through the BeSLab Platform, specifying the target (e.g., an OSS project).
@@ -498,7 +498,7 @@ group Decommissioning (Optional)
 end
 
 @enduml
-```plantuml
+```
 
 **Explanation of the Diagram:**
 
@@ -563,7 +563,7 @@ steps:
     action: generate_report
     input_from_steps: [20, 29] # Use results from SCA and SAST
     tool_selector: bes_report_generator_llm
-```yaml
+```
 
 * Illustrative Code (LangGraph \- Conceptual):  
   LangGraph is suitable here for managing the state (scan results) across multiple steps and orchestrating the flow.
@@ -669,9 +669,7 @@ steps:
 # final_state = app.invoke(initial_state)
 # print("\n---FINAL OSAR---")
 # print(final_state.get("osar"))
-
-
-```Python
+```
 
 * **Expected Output:** A dictionary or JSON object representing the OSAR, containing sections for SCA findings (e.g., {"dependencies": [{"name": "dep1", "version": "1.0", "vulnerabilities": ["CVE-2023-0001"]}]}) and SAST findings (e.g., {"sast_findings": [{"cwe": "CWE-79", "file": "app.js", "line": 10}]}). The bes_report_generator_llm would synthesize these into a coherent report.
 
@@ -684,7 +682,7 @@ This agent suggests patches for identified vulnerabilities.
 * **Scenario:** A critical SQL injection vulnerability (CWE-89) is found in example\_lib by BeSSAAgent-Assessor. BeSSAAgent-Remediator is tasked to suggest a patch.  
 * **BeSPlaybook Snippet (Conceptual YAML):**  
 
-```YAML  
+```yaml  
 playbook_id: OS_REMEDIATE_SQLI_001
 name: SQL Injection Basic Remediation
 target_type: source_code_vuln
@@ -715,11 +713,11 @@ steps:
     tool_selector: bes_linter
     params:
       code_to_verify: "{{ steps.output.suggested_patch }}"
-
+```
 * Illustrative Code (LangChain with RAG \- Conceptual):  
   This involves an agent using RAG to find secure coding patterns and then an LLM to generate a patch.1  
 
-```Python  
+```python  
 # Conceptual: Agent uses RAG to find best practices for fixing CWE-89
 # then calls bes_patch_suggester_llm tool with context.
 
@@ -801,17 +799,18 @@ steps:
 #     "fix_pattern_from_step1": step1_output["fix_pattern"]
 # })
 # print(f"\n---STEP 2 OUTPUT (Suggested Patch)---\n{step2_output}")
+```
 
-* **Expected Output:** A dictionary containing the suggested patch, e.g., {"suggested\_patch": "cursor.execute('SELECT \* FROM users WHERE username \= %s', (user\_input,)) \# Patched for CWE-89, user\_controller.py:105"}. The fix\_pattern from RAG would guide the LLM in bes\_patch\_suggester\_llm.  
+* **Expected Output:** A dictionary containing the suggested patch, e.g., {"suggested_patch": "cursor.execute('SELECT * FROM users WHERE username = %s', (user_input,)) # Patched for CWE-89, user_controller.py:105"}. The fix_pattern from RAG would guide the LLM in bes_patch_suggester_llm.  
   This example emphasizes the agent's ability to use RAG for knowledge retrieval (finding how to fix CWE-89) and then use that retrieved knowledge to guide another tool (an LLM-based patch suggester). The playbook orchestrates this by passing output from one step as input to the next. This demonstrates a more sophisticated reasoning process where the agent isn't just executing predefined commands but is actively seeking and applying knowledge.
 
 ### **7.3. Example 3: A Multi-Agent Scenario (Assessor hands off to Remediator using AutoGen)**
 
 This scenario shows how different BeSSAAIAgents might collaborate.
 
-* **Scenario:** BeSSAAgent-Assessor completes an assessment of example\_lib, finds a critical vulnerability (CVE-2023-1234), and needs to inform BeSSAAgent-Remediator to initiate the remediation process.  
-* Illustrative Code (AutoGen \- Conceptual Message Passing):  
-  AutoGen's strength lies in facilitating conversations and collaboration between agents. 53  
+* **Scenario:** BeSSAAgent-Assessor completes an assessment of example_lib, finds a critical vulnerability (CVE-2023-1234), and needs to inform BeSSAAgent-Remediator to initiate the remediation process.  
+* Illustrative Code (AutoGen - Conceptual Message Passing):  
+  AutoGen's strength lies in facilitating conversations and collaboration between agents.  
 
 ```Python  
 # import autogen
@@ -866,7 +865,7 @@ This scenario shows how different BeSSAAIAgents might collaborate.
 #     recipient=remediator_agent,
 #     message=f"Assessment for example_lib is complete. Please report critical findings to the Remediator. Here is the summary: \n{assessment_summary}"
 # )
-```Python 
+``` 
 
 * **Expected Outcome (Simulated Conversation Flow):**  
   1. BeS_Lab_UserProxy (to BeSSAAgent_Assessor): "Assessment for example_lib is complete. Please report critical findings to the Remediator. Here is the summary:..."  
@@ -1045,7 +1044,6 @@ The BeSPlaybooks themselves offer a rich source for generating test cases. Each 
 A robust logging and tracing framework, as offered by tools like LangSmith (often used with LangChain) 50 or built into frameworks like the OpenAI Agents SDK 5, will be indispensable for debugging test failures and understanding agent decision-making processes. The testing phase is not just about finding bugs but also about building confidence in the agents' capabilities and safety.
 
 ## **10. Future Roadmap **
-
 
 * **Advanced Learning Capabilities:**  
   * **Self-Improving Playbooks:** Agents could analyze the effectiveness of different playbook paths and tool combinations, learning which strategies yield the best results for specific types of OSS or vulnerabilities. This could lead to agents suggesting optimizations or even automatically refining playbooks over time (Reinforcement Learning from Human Feedback or outcome analysis).  
