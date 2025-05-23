@@ -56,9 +56,9 @@ The effectiveness of BeSSAAIAgents hinges on their access to comprehensive and u
 * **External Knowledge Integration (RAG):**  
   * Retrieval Augmented Generation (RAG) will be crucial for providing agents with access to vast external knowledge without constant retraining. 3  
   * Sources for RAG will include: Vulnerability databases (NVD, OSV), CWE/CAPEC/ATT\&CK frameworks, secure coding standards (OWASP, SEI CERT), OSS project documentation, threat intelligence feeds, and potentially a curated corpus of security research papers and articles.  
-  * This external knowledge allows agents to enrich their analysis, understand emerging threats, and provide contextually relevant recommendations. For example, when assessing a vulnerability, an agent can use RAG to fetch details about its exploitation, common mitigations, and affected software versions. 4  
+  * This external knowledge allows agents to enrich their analysis, understand emerging threats, and provide contextually relevant recommendations. For example, when assessing a vulnerability, an agent can use RAG to fetch details about its exploitation, common mitigations, and affected software versions.   
 * **Contextual Memory:**  
-  * **Short-Term Memory:** Maintaining context during a single playbook execution (e.g., results from previous steps, current target OSS). Frameworks like LangGraph and CrewAI offer mechanisms for state management within agent workflows. 10  
+  * **Short-Term Memory:** Maintaining context during a single playbook execution (e.g., results from previous steps, current target OSS). Frameworks like LangGraph and CrewAI offer mechanisms for state management within agent workflows.   
   * **Long-Term Memory:** Storing learnings from past interactions, successful/failed remediations, and analyst feedback to improve future performance. This could involve updating vector stores used by RAG or even fine-tuning specialized LLM components over time.
 
 The ability to effectively combine structured playbook instructions with the vast, unstructured knowledge retrieved via RAG, all while maintaining task context, is a core design challenge. The knowledge base must be continuously updated to remain relevant.
@@ -69,9 +69,9 @@ The core LLM acts as the reasoning engine.
 
 * **Playbook-Driven Planning:** BeSPlaybooks provide the primary plan or workflow. The agent's task is to execute this plan, making decisions at each step.  
 * **Tool Selection and Invocation:** Based on the current playbook step and context, the agent selects the appropriate BeSPlugin(s) and formulates the STCP command. This involves mapping playbook actions to plugin capabilities.  
-* **Dynamic Adaptation:** While playbooks provide a script, agents may need to adapt based on tool outputs or unexpected situations. For instance, if a primary tool fails, the agent might try an alternative or escalate to a human analyst. This requires a degree of dynamic planning or exception handling logic within the agent or the playbook itself. 14  
+* **Dynamic Adaptation:** While playbooks provide a script, agents may need to adapt based on tool outputs or unexpected situations. For instance, if a primary tool fails, the agent might try an alternative or escalate to a human analyst. This requires a degree of dynamic planning or exception handling logic within the agent or the playbook itself.   
 * **Confidence Scoring and Uncertainty Management:** Agents should associate confidence scores with their findings and recommendations. When uncertainty is high, escalation to a human analyst is necessary.  
-* **Ethical Considerations and Bias Mitigation:** Training data and LLM design must address potential biases to ensure fair and objective assessments. Guardrails and human oversight are critical. 15
+* **Ethical Considerations and Bias Mitigation:** Training data and LLM design must address potential biases to ensure fair and objective assessments. Guardrails and human oversight are critical. 
 
 The reasoning process isn't just about following a script; it's about intelligent execution. For example, if a playbook step is "Analyze for XSS vulnerabilities," the agent needs to decide which SAST or DAST tool is best suited, how to configure it for the target, and how to interpret the results in the context of the overall assessment.
 
@@ -94,16 +94,16 @@ To enable seamless and secure interaction between BeSSAAIAgents and the diverse 
 
 STCP will be designed based on the following core principles, ensuring it is robust, secure, and extensible:
 
-1. **Clear Semantics and Syntax:** Commands, responses, and data payloads must have unambiguous definitions. This aligns with OpenC2's approach of defining a language with clear structure for commands and responses. 18  
-2. **Extensibility:** The protocol must allow for the addition of new tools, commands, and data types without breaking existing implementations. OpenC2 Actuator Profiles provide a model for such extensibility. 19  
-3. **Security by Design:** Authentication, authorization, and data integrity are paramount. Interactions between agents and tools must be secure to prevent malicious manipulation or data leakage. This echoes security considerations highlighted for MCP, such as strong authentication and explicit authorization. 16  
+1. **Clear Semantics and Syntax:** Commands, responses, and data payloads must have unambiguous definitions. This aligns with OpenC2's approach of defining a language with clear structure for commands and responses.   
+2. **Extensibility:** The protocol must allow for the addition of new tools, commands, and data types without breaking existing implementations. OpenC2 Actuator Profiles provide a model for such extensibility.   
+3. **Security by Design:** Authentication, authorization, and data integrity are paramount. Interactions between agents and tools must be secure to prevent malicious manipulation or data leakage. This echoes security considerations highlighted for MCP, such as strong authentication and explicit authorization.  
 4. **Asynchronous Communication Support:** Many security tools perform long-running tasks. STCP must support asynchronous operations, allowing agents to initiate a task and receive notifications or retrieve results later.  
 5. **Standardized Data Formats:** Utilize common data formats like JSON for message payloads to ensure interoperability and ease of parsing. 20 STIX/TAXII principles for structured threat information exchange can inform data object definitions. 26  
 6. **Context Preservation:** Agents need to pass relevant context (e.g., target OSS details, previous findings) to tools. STCP messages must accommodate this contextual information, similar to MCP's focus on structured context management. 21  
-7. **Tool Capability Discovery:** Agents should be able to query BeSPlugins to discover their capabilities, supported commands, and required parameters. OpenC2 allows for capability discovery. 20  
-8. **Abstraction over Tool Specifics:** STCP should abstract common security functions (e.g., "scan for vulnerabilities," "get dependencies") so that agents can interact with different tools providing similar functionality in a standardized way. This is akin to OpenC2's function-centric approach. 19
+7. **Tool Capability Discovery:** Agents should be able to query BeSPlugins to discover their capabilities, supported commands, and required parameters. OpenC2 allows for capability discovery.   
+8. **Abstraction over Tool Specifics:** STCP should abstract common security functions (e.g., "scan for vulnerabilities," "get dependencies") so that agents can interact with different tools providing similar functionality in a standardized way. This is akin to OpenC2's function-centric approach. 
 
-The development of STCP should consider the lessons learned from protocols like OpenC2, which emphasizes a technology-agnostic language for cyber defense actions 20, and MCP, which aims for universal connectivity between AI and external systems. 21 This ensures that STCP is not just a messaging format but a comprehensive framework for agent-tool interaction.
+The development of STCP should consider the lessons learned from protocols like OpenC2, which emphasizes a technology-agnostic language for cyber defense actions , and MCP, which aims for universal connectivity between AI and external systems.  This ensures that STCP is not just a messaging format but a comprehensive framework for agent-tool interaction.
 
 ### **3.2. STCP Message Structure**
 
@@ -671,7 +671,8 @@ steps:
 # print(final_state.get("osar"))
 ```
 
-* **Expected Output:** A dictionary or JSON object representing the OSAR, containing sections for SCA findings (e.g., {"dependencies": [{"name": "dep1", "version": "1.0", "vulnerabilities": ["CVE-2023-0001"]}]}) and SAST findings (e.g., {"sast_findings": [{"cwe": "CWE-79", "file": "app.js", "line": 10}]}). The bes_report_generator_llm would synthesize these into a coherent report.
+* **Expected Output:** A dictionary or JSON object representing the OSAR, containing sections for SCA findings (e.g., ```{"dependencies": [{"name": "dep1", "version": "1.0", "vulnerabilities": ["CVE-2023-0001"]}]}) and SAST findings (e.g., {"sast_findings": [{"cwe": "CWE-79", "file": "app.js", "line": 10}]})```.
+* The bes_report_generator_llm would synthesize these into a coherent report.
 
 The structure of this agent demonstrates how a playbook's sequential steps can be mapped to a LangGraph workflow. Each step involves an STCP call (abstracted by a LangChain tool) to a BeSPlugin. The state management in LangGraph ensures that results from earlier steps (SCA, SAST) are available for later steps (report generation). This aligns with the need for agents to manage context during playbook execution.
 
@@ -801,7 +802,7 @@ steps:
 # print(f"\n---STEP 2 OUTPUT (Suggested Patch)---\n{step2_output}")
 ```
 
-* **Expected Output:** A dictionary containing the suggested patch, e.g., {"suggested_patch": "cursor.execute('SELECT * FROM users WHERE username = %s', (user_input,)) # Patched for CWE-89, user_controller.py:105"}. The fix_pattern from RAG would guide the LLM in bes_patch_suggester_llm.  
+* **Expected Output:** A dictionary containing the suggested patch, e.g., ```{"suggested_patch": "cursor.execute('SELECT * FROM users WHERE username = %s', (user_input,)) # Patched for CWE-89, user_controller.py:105"}. The fix_pattern from RAG would guide the LLM in bes_patch_suggester_llm.```  
   This example emphasizes the agent's ability to use RAG for knowledge retrieval (finding how to fix CWE-89) and then use that retrieved knowledge to guide another tool (an LLM-based patch suggester). The playbook orchestrates this by passing output from one step as input to the next. This demonstrates a more sophisticated reasoning process where the agent isn't just executing predefined commands but is actively seeking and applying knowledge.
 
 ### **7.3. Example 3: A Multi-Agent Scenario (Assessor hands off to Remediator using AutoGen)**
@@ -870,8 +871,7 @@ This scenario shows how different BeSSAAIAgents might collaborate.
 * **Expected Outcome (Simulated Conversation Flow):**  
   1. BeS_Lab_UserProxy (to BeSSAAgent_Assessor): "Assessment for example_lib is complete. Please report critical findings to the Remediator. Here is the summary:..."  
   2. BeSSAAgent_Assessor (to BeSSAAgent_Remediator): "Remediator, I have completed the assessment for example_lib v1.2.3. A CRITICAL vulnerability, CVE-2023-1234 (SQL Injection), was found in 'db_connector.py' in the 'get_user_data' function. The 'user_id' input is vulnerable. Please initiate remediation."  
-  3. BeSSAAgent_Remediator (to BeSSAAgent_Assessor): "Acknowledged, Assessor. I will prioritize CVE-2023-1234 in example_lib.
-     My initial plan is to:
+  3. BeSSAAgent_Remediator (to BeSSAAgent_Assessor): "Acknowledged, Assessor. I will prioritize CVE-2023-1234 in example_lib.My initial plan is to:
          1. Analyze the vulnerable code snippet for 'get_user_data'.
          2. Use RAG to find the standard parameterized query pattern for Python.
          3. Generate a patch suggestion. I will now proceed with the 'OS_REMEDIATE_SQLI_001' playbook."
@@ -892,11 +892,13 @@ Many security decisions require human judgment and accountability. BeSSAAIAgents
   * Before applying an auto-generated patch to production code.  
   * Before publishing an OSS component as TAVOSS.  
   * Confirming high-impact or ambiguous pentest findings.  
-  * Initiating broad security feature changes in an active OSS project.  
+  * Initiating broad security feature changes in an active OSS project.
+    
 * **BeSLab Interface for HITL:**  
   * When an agent reaches a HITL point, it will pause its execution and present its findings, proposed actions, and supporting evidence to a human analyst via the BeSLab dashboard.  
   * Analysts will be able to review the agent's reasoning (e.g., which playbook step, what RAG context was used), approve the action, reject it, request modifications, or take over manually.  
-  * Agent frameworks like AutoGen explicitly support human input within conversational flows, which can be adapted for these approval steps. 53 LangGraph's stateful nature also allows for pausing and resuming workflows based on external (human) input. 51  
+  * Agent frameworks like AutoGen explicitly support human input within conversational flows, which can be adapted for these approval steps. 53 LangGraph's stateful nature also allows for pausing and resuming workflows based on external (human) input.
+    
 * **Configurable Autonomy:** BeSLab may allow for configurable levels of autonomy for different tasks or agent types. For routine, low-risk tasks, agents might operate with less direct oversight after an initial period of validation.
 
 This HITL approach ensures that while agents automate significant parts of the workflow, ultimate control and responsibility for critical actions remain with human experts.
@@ -933,7 +935,8 @@ Agents must have mechanisms to escalate issues to human analysts when they canno
   * Receiving conflicting information from different BeSPlugins or RAG sources.  
   * High uncertainty in a finding or recommendation (below a configurable confidence threshold).  
   * Repeated failures of a BeSPlugin or STCP communication.  
-  * Detection of anomalies that might indicate a sophisticated attack or a problem with the Be-Secure infrastructure itself.  
+  * Detection of anomalies that might indicate a sophisticated attack or a problem with the Be-Secure infrastructure itself.
+    
 * **BeSLab Notification and Task Assignment:** When an escalation occurs, BeSLab will generate a notification and assign a task to the appropriate human analyst or team, providing all relevant context from the agent.
 
 ### **8.5. Dashboarding and Reporting for Human Oversight**
