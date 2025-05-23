@@ -35,12 +35,12 @@ The BeSSAAIAgent architecture will be modular, drawing inspiration from common A
   * Formulating commands for BeSPlugins using STCP.  
   * Analyzing plugin outputs and making decisions for subsequent steps.  
   * Generating content for OSARs, remediation suggestions, etc.  
-  * This engine will utilize Large Language Models (LLMs) for natural language understanding, generation, and complex reasoning. 1  
+  * This engine will utilize Large Language Models (LLMs) for natural language understanding, generation, and complex reasoning.  
 * **Action & Execution Layer:** Interacts with BeSPlugins via the Security Tool Context Protocol (STCP). It translates the reasoning engine's decisions into concrete STCP commands and manages the communication with the tools.  
 * **Learning & Feedback Loop:** Enables agents to improve over time. This involves:  
   * Analyzing the outcomes of their actions (e.g., effectiveness of a remediation).  
   * Incorporating feedback from human analysts in BeSLab.  
-  * Updating their knowledge base and potentially refining playbook execution strategies. 1
+  * Updating their knowledge base and potentially refining playbook execution strategies. 
 
 The distributed nature of security tools and the need for diverse agent capabilities suggest that different agent types might specialize in specific OASP services. This necessitates a multi-agent system where BeSSAAIAgents can collaborate and delegate tasks. 5 The choice of underlying AI agent frameworks (discussed later) will heavily influence the implementation of these architectural components.
 
@@ -54,7 +54,7 @@ The effectiveness of BeSSAAIAgents hinges on their access to comprehensive and u
   * **BeSPlugin Capabilities:** A registry of BeSPlugins, their functions, expected inputs/outputs, and STCP integration details.  
   * **STCP Protocol:** Fluent understanding of STCP for tool interaction.  
 * **External Knowledge Integration (RAG):**  
-  * Retrieval Augmented Generation (RAG) will be crucial for providing agents with access to vast external knowledge without constant retraining. 3  
+  * Retrieval Augmented Generation (RAG) will be crucial for providing agents with access to vast external knowledge without constant retraining.   
   * Sources for RAG will include: Vulnerability databases (NVD, OSV), CWE/CAPEC/ATT\&CK frameworks, secure coding standards (OWASP, SEI CERT), OSS project documentation, threat intelligence feeds, and potentially a curated corpus of security research papers and articles.  
   * This external knowledge allows agents to enrich their analysis, understand emerging threats, and provide contextually relevant recommendations. For example, when assessing a vulnerability, an agent can use RAG to fetch details about its exploitation, common mitigations, and affected software versions.   
 * **Contextual Memory:**  
@@ -113,14 +113,14 @@ STCP messages will generally follow a request-response pattern, with support for
   * message_id: Unique identifier for the message.  
   * agent_id: Identifier of the BeSSAAIAgent sending the command.  
   * plugin_id (Target): Identifier of the target BeSPlugin.  
-  * action: The specific operation to be performed by the plugin (e.g., scan\_code, analyze\_dependencies, remediate\_vulnerability). This is similar to OpenC2's Action field.  
+  * action: The specific operation to be performed by the plugin (e.g., scan_code, analyze_dependencies, remediate_vulnerability). This is similar to OpenC2's Action field.  
   * target_specifiers: Detailed information about the target of the action (e.g., OSS name, version, specific file paths, vulnerability ID). Analogous to OpenC2's Target.  
   * arguments: Parameters required for the action (e.g., scan configurations, remediation strategies, credentials if securely managed). Similar to OpenC2's Arguments.  
   * context: Relevant contextual information from the BeSPlaybook or previous steps (e.g., OSAR findings, threat intelligence).  
   * timestamp: Time of command issuance.  
   * signature: Digital signature for message integrity and authenticity.  
 * **STCP Response Message:**  
-  * correlation_id: Links the response to the original message\_id of the command.  
+  * correlation_id: Links the response to the original message_id of the command.  
   * plugin_id: Identifier of the BeSPlugin sending the response.  
   * agent_id: Identifier of the target BeSSAAIAgent.  
   * status: Indicates success, failure, or pending state of the action (e.g., COMPLETED, FAILED, IN_PROGRESS).  
@@ -282,7 +282,7 @@ The choice of toolkit will depend on the specific requirements of each BeSSAAIAg
 * **LangChain / LangGraph:**  
   * **Suitability:** Excellent for building individual agent capabilities, defining tool usage (wrapping STCP calls as LangChain Tools), and managing conversational memory. 49 LangGraph, in particular, is well-suited for creating complex, stateful agentic workflows with cycles, which is relevant for iterative playbook execution and human-in-the-loop scenarios.   
   * **Usage:**  
-    * Define BeSPlugins as custom LangChain BaseTool implementations, where the \_run method constructs and sends STCP commands.  
+    * Define BeSPlugins as custom LangChain BaseTool implementations, where the _run method constructs and sends STCP commands.  
     * Use LangChain Expression Language (LCEL) to chain LLM calls, tool executions, and output parsing for individual playbook steps.  
     * Employ LangGraph to model the overall execution of a BeSPlaybook as a graph, where nodes represent playbook steps or decision points, and edges represent transitions. LangGraph's persistent state management is crucial for long-running assessments or remediations.   
     * Implement RAG pipelines using LangChain's document loaders, text splitters, embedding models, and vector stores.   
@@ -305,7 +305,7 @@ The choice of toolkit will depend on the specific requirements of each BeSSAAIAg
 * **OpenAI Agents SDK (and similar proprietary SDKs if open-source alternatives are used):**  
   * **Suitability:** While the user query focuses on open-source, understanding the primitives offered by SDKs like OpenAI's (Agents, Handoffs, Guardrails) can inform the design of BeSSAAIAgents, even if implemented using fully open-source stacks. 5 The concepts are valuable.  
   * **Usage (Conceptual, guiding open-source implementation):**  
-    * The "Agent" primitive (LLM \+ instructions \+ tools) is fundamental to all BeSSAAIAgents.  
+    * The "Agent" primitive (LLM + instructions + tools) is fundamental to all BeSSAAIAgents.  
     * The "Handoffs" concept is crucial for multi-agent collaboration, similar to what AutoGen or CrewAI enable.  
     * "Guardrails" for input/output validation are essential for security and reliability, and should be implemented regardless of the framework.  
 * **OpenDAN (Personal AI OS):**  
@@ -318,7 +318,7 @@ A hybrid approach is likely optimal: LangChain/LangGraph for building the core c
 
 * **BeSPlaybook as a Domain-Specific Language (DSL):**  
   * BeSSAAIAgents will be trained to parse and interpret BeSPlaybooks. This involves understanding the playbook schema, the meaning of different action verbs, parameters, and control flow structures (e.g., conditional execution, loops).  
-  * The LLM component of the agent will translate playbook instructions into sequences of STCP calls to BeSPlugins. 7 This makes the playbooks a high-level programming language for the agents.  
+  * The LLM component of the agent will translate playbook instructions into sequences of STCP calls to BeSPlugins.  This makes the playbooks a high-level programming language for the agents.  
 * **BeSEnvironment Awareness:**  
   * Agents must be able to query the BeSEnvironment to understand available resources, tool configurations, and access credentials (securely managed). This information is part of the context passed to agents.  
 * **BeSPlugin Integration via STCP:**  
@@ -326,7 +326,7 @@ A hybrid approach is likely optimal: LangChain/LangGraph for building the core c
 
 ### **5.3. Role of Retrieval Augmented Generation (RAG)**
 
-RAG is fundamental to providing BeSSAAIAgents with the vast, up-to-date knowledge required for security analysis. 3
+RAG is fundamental to providing BeSSAAIAgents with the vast, up-to-date knowledge required for security analysis. 
 
 * **Knowledge Sources:** Vulnerability databases, secure coding standards, threat intelligence, OSS documentation, etc.  
 * **Implementation:**  
@@ -352,7 +352,7 @@ Training involves several aspects:
 
 The development process will be iterative, starting with basic agent capabilities for a single OASP service and gradually expanding functionality and sophistication. The open-source nature of the agents and the underlying frameworks will allow the community to contribute to their training and improvement.
 
-## **6\. BeSLab: Interactions and Agent Lifecycle**
+## **6. BeSLab: Interactions and Agent Lifecycle**
 
 The BeSLab serves as the central operational environment where human analysts and BeSSAAIAgents collaborate. It facilitates the execution of BeSPlaybooks and manages the lifecycle of the agents.
 
@@ -716,7 +716,7 @@ steps:
       code_to_verify: "{{ steps.output.suggested_patch }}"
 ```
 * Illustrative Code (LangChain with RAG \- Conceptual):  
-  This involves an agent using RAG to find secure coding patterns and then an LLM to generate a patch.1  
+  This involves an agent using RAG to find secure coding patterns and then an LLM to generate a patch.  
 
 ```python  
 # Conceptual: Agent uses RAG to find best practices for fixing CWE-89
@@ -1030,10 +1030,10 @@ The BeSPlaybooks themselves offer a rich source for generating test cases. Each 
 
 | Test Case ID | Description | BeSPlaybook Step(s) Involved | Input Data/Target | Expected Agent Action(s) via STCP | Expected Output (e.g., OSAR section) | Pass/Fail Criteria |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| FT-ASS-001 | Verify SCA scan identifies known CVE in a direct dependency. | run\_sca (using bes\_sca\_tool) | OSS with dependency libX v1.0 (known CVE-2023-0001) | Invoke bes\_sca\_tool with action: run\_sca, target: libX v1.0. | OSAR lists CVE-2023-0001 for libX v1.0. | CVE correctly identified and reported. |
-| FT-ASS-002 | Verify SAST scan identifies XSS vulnerability from playbook pattern. | run\_sast (using bes\_vuln\_scanner\_sast) | Code snippet with a clear reflected XSS pattern. | Invoke bes\_vuln\_scanner\_sast with action: run\_sast, target: \<code\_path\>. | OSAR lists CWE-79 at the correct location. | XSS vulnerability correctly identified and reported with accurate location. |
-| FT-ASS-003 | Verify OSAR generation combines SCA and SAST results correctly. | generate\_report (using bes\_report\_generator\_llm) | Mock SCA results (1 CVE), Mock SAST results (1 CWE). | Invoke bes\_report\_generator\_llm with context including SCA & SAST data. | OSAR contains distinct sections for SCA and SAST findings, accurately reflecting mock inputs. | Report structure is correct, and all mock findings are present and accurately attributed. |
-| FT-ASS-004 | Verify agent handles tool\_selector correctly for alternative tools. | run\_sca (playbook specifies bes\_sca\_tool\_alt if primary fails) | OSS target, primary SCA tool configured to fail. | Attempts bes\_sca\_tool, then invokes bes\_sca\_tool\_alt. | OSAR contains results from bes\_sca\_tool\_alt. | Agent correctly falls back to alternative tool as per playbook logic. |
+| FT-ASS-001 | Verify SCA scan identifies known CVE in a direct dependency. | run_sca (using bes_sca_tool) | OSS with dependency libX v1.0 (known CVE-2023-0001) | Invoke bes_sca_tool with action: run_sca, target: libX v1.0. | OSAR lists CVE-2023-0001 for libX v1.0. | CVE correctly identified and reported. |
+| FT-ASS-002 | Verify SAST scan identifies XSS vulnerability from playbook pattern. | run_sast (using bes_vuln_scanner_sast) | Code snippet with a clear reflected XSS pattern. | Invoke bes_vuln_scanner_sast with action: run_sast, target: \<code\_path\>. | OSAR lists CWE-79 at the correct location. | XSS vulnerability correctly identified and reported with accurate location. |
+| FT-ASS-003 | Verify OSAR generation combines SCA and SAST results correctly. | generate_report (using bes_report_generator_llm) | Mock SCA results (1 CVE), Mock SAST results (1 CWE). | Invoke bes_report_generator_llm with context including SCA & SAST data. | OSAR contains distinct sections for SCA and SAST findings, accurately reflecting mock inputs. | Report structure is correct, and all mock findings are present and accurately attributed. |
+| FT-ASS-004 | Verify agent handles tool_selector correctly for alternative tools. | run_sca (playbook specifies bes_sca_tool_alt if primary fails) | OSS target, primary SCA tool configured to fail. | Attempts bes_sca_tool, then invokes bes_sca_tool_alt. | OSAR contains results from bes_sca_tool_alt. | Agent correctly falls back to alternative tool as per playbook logic. |
 
 **Table 2: Sample Security Test Cases for BeSSAAIAgents**
 
